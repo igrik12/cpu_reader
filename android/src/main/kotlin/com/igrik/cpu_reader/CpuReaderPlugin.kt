@@ -1,7 +1,7 @@
 package com.igrik.cpu_reader
 
-import androidx.annotation.NonNull;
-
+import androidx.annotation.NonNull
+import com.google.gson.Gson
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -9,15 +9,12 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-
 /** CpuReaderPlugin */
 public class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
-    /// The MethodChannel that will the communication between Flutter and native Android
-    ///
-    /// This local reference serves to register the plugin with the Flutter Engine and unregister it
-    /// when the Flutter Engine is detached from the Activity
+    // / The MethodChannel that will the communication between Flutter and native Android
+    // /
+    // / This local reference serves to register the plugin with the Flutter Engine and unregister it
+    // / when the Flutter Engine is detached from the Activity
     private lateinit var channel: MethodChannel
     private lateinit var cpuProvider: CpuDataProvider
     private lateinit var gson: Gson
@@ -46,9 +43,11 @@ public class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
+    // This function retrieves all of the CPU information for all the cores
+    // as CpuInfo object
     private fun getCpuInfo(): CpuInfo {
-        val abi = cpuProvider.getAbi();
-        val cores = cpuProvider.getNumberOfCores();
+        val abi = cpuProvider.getAbi()
+        val cores = cpuProvider.getNumberOfCores()
         val currentFrequencies = mutableMapOf<Int, Long>()
         val minMaxFrequencies = mutableMapOf<Int, Pair<Long, Long>>()
         for (i in 0..cores - 1) {
@@ -61,10 +60,16 @@ public class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
-            "getCores" -> result.success(cpuProvider.getNumberOfCores())
-            "getCurrentFrequencies" -> {
-                val core = (call.argument("core") as? Int) ?: 0
-                result.success(cpuProvider.getCurrentFreq(core))
+            "getAbi" -> result.success(cpuProvider.getAbi())
+            "getNumberOfCores" -> result.success(cpuProvider.getNumberOfCores())
+            "getCurrentFrequency" -> {
+                val coreNumber = (call.argument("coreNumber") as? Int) ?: 0
+                result.success(cpuProvider.getCurrentFreq(coreNumber))
+            }
+            "getMinMaxFrequencies" -> {
+                val coreNumber = (call.argument("coreNumber") as? Int) ?: 0
+                val pair = cpuProvider.getMinMaxFreq(coreNumber)
+                result.success(mapOf(pair))
             }
             "getCpuInfo" -> result.success(gson.toJson(getCpuInfo()))
             else -> {

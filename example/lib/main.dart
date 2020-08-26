@@ -1,6 +1,4 @@
-import 'dart:convert';
-
-import 'package:cpu_reader/models/cpuinfo.dart';
+import 'package:cpu_reader/cpuinfo.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -82,7 +80,6 @@ class CpuChartState extends State<CpuChart>
   LineChartController controller;
   int _removalCounter = 0;
 
-  CpuInfo _cpuInfo;
   Timer _timer;
 
   @override
@@ -99,13 +96,11 @@ class CpuChartState extends State<CpuChart>
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    _timer = Timer.periodic(Duration(milliseconds: 100), (timer) async {
+    _timer = Timer.periodic(Duration(milliseconds: 1000), (timer) async {
       CpuInfo cpuInfo;
       // Platform messages may fail, so we use a try/catch PlatformException.
       try {
-        var cpuInfoJson = await CpuReader.platformVersion;
-        Map<String, dynamic> info = jsonDecode(cpuInfoJson);
-        cpuInfo = CpuInfo.fromJson(info);
+        cpuInfo = await CpuReader.cpuInfo;
       } on PlatformException {
         cpuInfo = null;
       }
@@ -117,9 +112,7 @@ class CpuChartState extends State<CpuChart>
       var index = widget.index;
       addEntry(cpuInfo.currentFriquencies['$index'].toDouble());
 
-      setState(() {
-        _cpuInfo = cpuInfo;
-      });
+      setState(() {});
     });
   }
 
@@ -146,7 +139,6 @@ class CpuChartState extends State<CpuChart>
   void onValueSelected(Entry e, Highlight h) {}
 
   void addEntry(double y0) {
-    //print("y: ${y0.toInt()} ${y1.toInt()}");
     LineData data = controller.data;
     if (data != null) {
       ILineDataSet set0 = data.getDataSetByIndex(0);
