@@ -4,8 +4,8 @@ A basic CPU reader that provides a simple way of retrieving device CPU info.
 
 # Usage
 
-Import `package:device_info/device_info.dart`, instantiate `DeviceInfoPlugin`
-and use the Android and iOS getters to get platform-specific device
+Import `package:device_info/device_info.dart`, `CpuReader`
+use the Android getters to get device cpu information
 information.
 
 Example:
@@ -24,3 +24,4 @@ print('Core number 2 freq ${freq} Mhz');
 
 For help getting started with Flutter, view our online [documentation] (https://flutter.dev/)
 For help on editing plugin code, view the [documentation](https://flutter.dev/docs/development/packages-and-plugins/using-packages#edit-code)
+```

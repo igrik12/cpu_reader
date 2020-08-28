@@ -6,3 +6,7 @@
 
 * Updated example
 * Cleaned up dependencies
+
+## 0.0.3
+
+* Updated README.md
