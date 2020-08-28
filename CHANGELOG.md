@@ -10,3 +10,11 @@
 ## 0.0.3
 
 * Updated README.md
+
+## 0.0.4
+
+* Doc typos
+
+## 0.0.5
+
+* More documentation fixes
