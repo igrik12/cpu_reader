@@ -11,8 +11,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  charts_flutter:
-  mp_chart:
   cpu_reader:
     # When depending on this package from a real application you should use:
     #   cpu_reader: ^x.y.z

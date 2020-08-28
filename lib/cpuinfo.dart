@@ -24,7 +24,7 @@ class CpuInfo {
     Map.from(json['minMaxFrequencies']).forEach((key, value) {
       var map = Map.from(value);
       this.minMaxFrequencies[key] =
-          MinMaxFrequency(min: map['first'], max: map['second']);
+          MinMaxFrequency(map['first'], map['second']);
     });
   }
 
