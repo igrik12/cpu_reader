@@ -7,6 +7,15 @@ import 'package:flutter/services.dart';
 /// plugins using asynchronous method calls through [cpu_reader] channel.
 class CpuReader {
   static const MethodChannel _channel = const MethodChannel('cpu_reader');
+  static const EventChannel _stream = EventChannel('cpuReaderStream');
+
+  static Stream<CpuInfo> cpuStream(int intervalInSeconds) {
+    return _stream.receiveBroadcastStream(intervalInSeconds).map((event) {
+      Map<String, dynamic> info = jsonDecode(event);
+      var jsonObj = CpuInfo.fromJson(info);
+      return jsonObj;
+    });
+  }
 
   // Gets the Android Binary Interface of the device
   static Future<String> get abi async {
