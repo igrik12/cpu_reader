@@ -20,9 +20,10 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('CPU reader'),
+          title: const Text('CPU Reader'),
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -71,6 +72,16 @@ class _MyAppState extends State<MyApp> {
             },
           )),
         ),
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.only(bottom: 16.0),
+          child: FloatingActionButton(
+            onPressed: () {
+              setState(() {});
+            },
+            child: Icon(Icons.refresh),
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
   }
