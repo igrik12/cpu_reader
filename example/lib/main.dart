@@ -55,7 +55,7 @@ class _MyAppState extends State<MyApp> {
                                     style: TextStyle(color: Colors.blue),
                                   ),
                                   Text(
-                                      '${snapshot.data.currentFriquencies['1']}',
+                                      '${snapshot.data.currentFriquencies['2']}',
                                       style: TextStyle(color: Colors.blue)),
                                 ],
                               );

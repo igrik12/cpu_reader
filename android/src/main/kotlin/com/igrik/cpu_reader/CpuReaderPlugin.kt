@@ -37,8 +37,7 @@ class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
         eventChannel = EventChannel(flutterPluginBinding.flutterEngine.dartExecutor, "cpuReaderStream")
         eventChannel.setStreamHandler(object : EventChannel.StreamHandler{
             override fun onListen(args: Any?, events: EventChannel.EventSink) {
-                var interval = args as? Long ?: 1000
-                Log.w("Arguments", "$interval")
+                var interval = args as? Int ?: 1000
                 Log.w(TAG, "added stream listener with interval $interval milliseconds")
 
                 fun handler(timer: Long){
@@ -50,7 +49,7 @@ class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
                     events.error("STREAM", "Error in processing observable", error.message);
                 }
                 timerSubscription = Observable
-                        .interval(0, interval, TimeUnit.MILLISECONDS)
+                        .interval(0, interval.toLong(), TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(::handler, ::errorHandler)
             }
