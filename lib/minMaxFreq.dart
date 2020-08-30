@@ -6,4 +6,6 @@ class MinMaxFrequency<T> {
   T get max => _max;
 
   MinMaxFrequency(this._min, this._max);
+
+  Map<String, dynamic> toJson() => {"min": this.min, "max": this.max};
 }

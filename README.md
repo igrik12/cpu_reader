@@ -1,6 +1,6 @@
 # cpu_reader
 
-A basic CPU reader that provides a simple way of retrieving device CPU info.
+A basic CPU reader that provides a simple way of retrieving device CPU info (Currently only Android).
 
 # Usage
 

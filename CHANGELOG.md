@@ -23,3 +23,7 @@
 
 * CPUInfo stream added
 * CPU freq index done by int (used to be String)
+
+## 0.0.7
+
+* Updated doc to remove IOS support
