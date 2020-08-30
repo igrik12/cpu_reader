@@ -40,6 +40,28 @@ class _MyAppState extends State<MyApp> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      StreamBuilder(
+                          stream: CpuReader.cpuStream(5000),
+                          builder:
+                              (context, AsyncSnapshot<Map<int, int>> snapshot) {
+                            if (snapshot.connectionState ==
+                                    ConnectionState.active &&
+                                snapshot.hasData) {
+                              return Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'CPU core 1 Stream frequency',
+                                    style: TextStyle(color: Colors.blue),
+                                  ),
+                                  Text('${snapshot.data[2]}',
+                                      style: TextStyle(color: Colors.blue)),
+                                ],
+                              );
+                            }
+                            return CircularProgressIndicator();
+                          }),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
