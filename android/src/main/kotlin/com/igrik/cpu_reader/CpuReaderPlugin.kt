@@ -37,11 +37,11 @@ class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
         eventChannel = EventChannel(flutterPluginBinding.flutterEngine.dartExecutor, "cpuReaderStream")
         eventChannel.setStreamHandler(object : EventChannel.StreamHandler{
             override fun onListen(args: Any?, events: EventChannel.EventSink) {
-                var interval = args as? Int ?: 1000
+                val interval = args as? Int ?: 1000
                 Log.w(TAG, "added stream listener with interval $interval milliseconds")
 
                 fun handler(timer: Long){
-                    events.success(gson.toJson(getCpuInfo()))
+                    events.success(getCurrentFrequencies())
                 }
 
                 fun errorHandler(error:Throwable){
@@ -81,6 +81,15 @@ class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
+    private fun getCurrentFrequencies(): MutableMap<Int, Long>{
+        val cores = cpuProvider.getNumberOfCores()
+        val currentFrequencies = mutableMapOf<Int, Long>()
+        for (i in 0 until cores) {
+            currentFrequencies[i] = cpuProvider.getCurrentFreq(i)
+        }
+        return currentFrequencies
+    }
+
     // This function retrieves all of the CPU information for all the cores
     // as CpuInfo object
     private fun getCpuInfo(): CpuInfo {
@@ -88,9 +97,9 @@ class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
         val cores = cpuProvider.getNumberOfCores()
         val currentFrequencies = mutableMapOf<Int, Long>()
         val minMaxFrequencies = mutableMapOf<Int, Pair<Long, Long>>()
-        for (i in 0..cores - 1) {
-            currentFrequencies.put(i, cpuProvider.getCurrentFreq(i))
-            minMaxFrequencies.put(i, cpuProvider.getMinMaxFreq(i))
+        for (i in 0 until cores) {
+            currentFrequencies[i] = cpuProvider.getCurrentFreq(i)
+            minMaxFrequencies[i] = cpuProvider.getMinMaxFreq(i)
         }
 
         return CpuInfo(abi = abi, numberOfCores = cores, currentFrequencies = currentFrequencies, minMaxFrequencies = minMaxFrequencies)

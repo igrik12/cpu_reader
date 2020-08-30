@@ -1,6 +1,6 @@
 # cpu_reader
 
-A basic CPU reader that provides a simple way of retrieving device CPU info (Currently only Android).
+A basic CPU reader that provides a simple way of retrieving device CPU info (Currently only supports Android).
 
 # Usage
 
@@ -19,10 +19,5 @@ print('Number of Cores ${cpuInfo.numberOfCores}');
 int freq = await CpuReader.getCurrentFrequency(2);
 print('Core number 2 freq ${freq} Mhz');
 
-CpuReader.cpuStream(1000).listen((event) => print(event.currentFriquencies['2']))
+CpuReader.cpuStream(1000).listen((currentFrequencies) => print(currentFrequencies[2]))
 ```
-
-## Getting Started
-
-For help getting started with Flutter, view [documentation](https://flutter.dev/).  
-For help on editing plugin code, view the [documentation](https://flutter.dev/docs/development/packages-and-plugins/using-packages#edit-code).
