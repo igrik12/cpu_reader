@@ -33,3 +33,12 @@
 
 ## 0.0.9
 * Pre-stable release
+
+## 1.0.0
+* First stable release
+    - Frequency stream added
+    - CPU info as blob
+    - Individual metrics/cpu information 
+
+## 1.0.1
+* Minor bug fixes
