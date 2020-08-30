@@ -18,3 +18,8 @@
 ## 0.0.5
 
 * More documentation fixes
+
+## 0.0.6
+
+* CPUInfo stream added
+* CPU freq index done by int (used to be String)

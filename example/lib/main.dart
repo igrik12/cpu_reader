@@ -54,8 +54,7 @@ class _MyAppState extends State<MyApp> {
                                     'CPU core 1 Stream frequency',
                                     style: TextStyle(color: Colors.blue),
                                   ),
-                                  Text(
-                                      '${snapshot.data.currentFriquencies['2']}',
+                                  Text('${snapshot.data.currentFriquencies[2]}',
                                       style: TextStyle(color: Colors.blue)),
                                 ],
                               );
