@@ -27,3 +27,18 @@
 ## 0.0.7
 
 * Updated doc to remove IOS support
+
+## 0.0.8
+* Fixing broken package
+
+## 0.0.9
+* Pre-stable release
+
+## 1.0.0
+* First stable release
+    - Frequency stream added
+    - CPU info as blob
+    - Individual metrics/cpu information 
+
+## 1.0.1
+* Minor bug fixes
