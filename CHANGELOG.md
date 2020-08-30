@@ -23,3 +23,13 @@
 
 * CPUInfo stream added
 * CPU freq index done by int (used to be String)
+
+## 0.0.7
+
+* Updated doc to remove IOS support
+
+## 0.0.8
+* Fixing broken package
+
+## 0.0.9
+* Pre-stable release

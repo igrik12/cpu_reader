@@ -9,12 +9,10 @@ class CpuReader {
   static const MethodChannel _channel = const MethodChannel('cpu_reader');
   static const EventChannel _stream = EventChannel('cpuReaderStream');
 
-  static Stream<CpuInfo> cpuStream(int intervalInSeconds) {
-    return _stream.receiveBroadcastStream(intervalInSeconds).map((event) {
-      Map<String, dynamic> info = jsonDecode(event);
-      var jsonObj = CpuInfo.fromJson(info);
-      return jsonObj;
-    });
+  static Stream<Map<int, int>> cpuStream(int intervalInSeconds) {
+    return _stream
+        .receiveBroadcastStream(intervalInSeconds)
+        .map((event) => Map.from(event));
   }
 
   // Gets the Android Binary Interface of the device
@@ -58,8 +56,8 @@ class CpuReader {
   /// This retries the overall information [CpuInfo] of the device CPU.
   static Future<CpuInfo> get cpuInfo async {
     try {
-      final String cpuIngoJson = await _channel.invokeMethod('getCpuInfo');
-      Map<String, dynamic> info = jsonDecode(cpuIngoJson);
+      final String cpuInfoJson = await _channel.invokeMethod('getCpuInfo');
+      Map<String, dynamic> info = jsonDecode(cpuInfoJson);
       var jsonObj = CpuInfo.fromJson(info);
       return jsonObj;
     } on PlatformException catch (e) {

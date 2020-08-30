@@ -42,7 +42,8 @@ class _MyAppState extends State<MyApp> {
                     children: [
                       StreamBuilder(
                           stream: CpuReader.cpuStream(5000),
-                          builder: (context, AsyncSnapshot<CpuInfo> snapshot) {
+                          builder:
+                              (context, AsyncSnapshot<Map<int, int>> snapshot) {
                             if (snapshot.connectionState ==
                                     ConnectionState.active &&
                                 snapshot.hasData) {
@@ -54,7 +55,7 @@ class _MyAppState extends State<MyApp> {
                                     'CPU core 1 Stream frequency',
                                     style: TextStyle(color: Colors.blue),
                                   ),
-                                  Text('${snapshot.data.currentFriquencies[2]}',
+                                  Text('${snapshot.data[2]}',
                                       style: TextStyle(color: Colors.blue)),
                                 ],
                               );

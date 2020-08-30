@@ -29,13 +29,14 @@ class CpuInfo {
     });
   }
 
-  // Serialize the data to json
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['abi'] = this.abi;
-    data['numberOfCores'] = this.numberOfCores;
-    data['currentFrequencies'] = this.currentFriquencies;
-    data['minMaxFrequencies'] = this.minMaxFrequencies;
-    return data;
+  Map<String, dynamic> toJson() => {
+        "abi": abi,
+        "numberOfCores": numberOfCores,
+        "currentFrequencies": currentFriquencies.map(convert),
+        "minMaxFrequencies": minMaxFrequencies.map(convert)
+      };
+
+  MapEntry convert<T>(int key, T value) {
+    return MapEntry(key.toString(), value);
   }
 }

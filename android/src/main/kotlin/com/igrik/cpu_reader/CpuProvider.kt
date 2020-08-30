@@ -8,7 +8,9 @@ import java.io.RandomAccessFile
 import java.util.regex.Pattern
 
 class CpuDataProvider constructor() {
-
+    /**
+    Read Android Binary Interface information from the device
+     */
     fun getAbi(): String {
         return if (Build.VERSION.SDK_INT >= 21) {
             Build.SUPPORTED_ABIS[0]
