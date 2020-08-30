@@ -20,6 +20,7 @@ int freq = await CpuReader.getCurrentFrequency(2);
 print('Core number 2 freq ${freq} Mhz');
 
 CpuReader.cpuStream(1000).listen((currentFrequencies) => print(currentFrequencies[2]))
+
 ```
 
 ## Getting Started
