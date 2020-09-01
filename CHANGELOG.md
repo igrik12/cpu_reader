@@ -42,3 +42,7 @@
 
 ## 1.0.1
 * Minor bug fixes
+
+## 1.0.2
+* Added temperature value retrieval
+* Now also allows to stream all of the other CPU info (static data such as min/max frequencies is cached, therefore no unnecessarry api calls)

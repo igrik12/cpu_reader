@@ -1,6 +1,6 @@
 name: cpu_reader
-description: A CPU reader plugin for Android devices
-version: 1.0.1
+description: A CPU reader plugin for Android devices. The plugin provides some basic information about the device, such as number of cores, abi, current frequencies, min/max frequencies and temperature. Cpu information retrieval can be achieve with both Future and Stream. 
+version: 1.0.2
 homepage: https://github.com/igrik12/cpu_reader
 
 environment:
