@@ -28,25 +28,28 @@ class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
     private lateinit var gson: Gson
     private var timerSubscription: Disposable? = null
     private val TAG: String = "CPU Event Channel"
+    private lateinit var cache: HashMap<String, Any>
 
+    @Suppress("UNCHECKED_CAST")
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.flutterEngine.dartExecutor, "cpu_reader")
         channel.setMethodCallHandler(this)
         cpuProvider = CpuDataProvider()
         gson = Gson()
+        cache = hashMapOf<String, Any>()
         eventChannel = EventChannel(flutterPluginBinding.flutterEngine.dartExecutor, "cpuReaderStream")
-        eventChannel.setStreamHandler(object : EventChannel.StreamHandler{
+        eventChannel.setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(args: Any?, events: EventChannel.EventSink) {
                 val interval = args as? Int ?: 1000
                 Log.w(TAG, "added stream listener with interval $interval milliseconds")
 
-                fun handler(timer: Long){
-                    events.success(getCurrentFrequencies())
+                fun handler(timer: Long) {
+                    events.success(gson.toJson(getCpuInfo()))
                 }
 
-                fun errorHandler(error:Throwable){
-                    Log.e(TAG, "error in emitting timer", error);
-                    events.error("STREAM", "Error in processing observable", error.message);
+                fun errorHandler(error: Throwable) {
+                    Log.e(TAG, "error in emitting timer", error)
+                    events.error("STREAM", "Error in processing observable", error.message)
                 }
                 timerSubscription = Observable
                         .interval(0, interval.toLong(), TimeUnit.MILLISECONDS)
@@ -54,14 +57,22 @@ class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
                         .subscribe(::handler, ::errorHandler)
             }
             override fun onCancel(p0: Any?) {
-                Log.w(TAG, "cancelling listener");
+                Log.w(TAG, "cancelling listener")
                 if (timerSubscription != null) {
                     timerSubscription!!.dispose()
-                    timerSubscription = null;
+                    timerSubscription = null
                 }
             }
         })
-
+    }
+    
+    private fun getCurrentFrequencies(): MutableMap<Int, Long> {
+        val cores = cpuProvider.getNumberOfCores()
+        val currentFrequencies = mutableMapOf<Int, Long>()
+        for (i in 0 until cores) {
+            currentFrequencies[i] = cpuProvider.getCurrentFreq(i)
+        }
+        return currentFrequencies
     }
 
     // This static function is optional and equivalent to onAttachedToEngine. It supports the old
@@ -81,28 +92,27 @@ class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
-    private fun getCurrentFrequencies(): MutableMap<Int, Long>{
-        val cores = cpuProvider.getNumberOfCores()
-        val currentFrequencies = mutableMapOf<Int, Long>()
-        for (i in 0 until cores) {
-            currentFrequencies[i] = cpuProvider.getCurrentFreq(i)
-        }
-        return currentFrequencies
-    }
-
     // This function retrieves all of the CPU information for all the cores
     // as CpuInfo object
+    @Suppress("UNCHECKED_CAST")
     private fun getCpuInfo(): CpuInfo {
-        val abi = cpuProvider.getAbi()
-        val cores = cpuProvider.getNumberOfCores()
+        val abi = cache.getOrPut("abi") { cpuProvider.getAbi() } as String
+        val cores = cache.getOrPut("cores") { cpuProvider.getNumberOfCores() }
+        val minMaxFrequencies = cache.getOrPut("minMaxFrequencies") {
+            var minMax = mutableMapOf<Int, Pair<Long, Long>>()
+            for (i in 0 until cores as Int) {
+                minMax[i] = cpuProvider.getMinMaxFreq(i)
+            }
+            minMax
+        } as MutableMap<Int, Pair<Long, Long>>
+
+        val cpuTemperature = cpuProvider.getCpuTemperature()
         val currentFrequencies = mutableMapOf<Int, Long>()
-        val minMaxFrequencies = mutableMapOf<Int, Pair<Long, Long>>()
-        for (i in 0 until cores) {
+        for (i in 0 until cores as Int) {
             currentFrequencies[i] = cpuProvider.getCurrentFreq(i)
-            minMaxFrequencies[i] = cpuProvider.getMinMaxFreq(i)
         }
 
-        return CpuInfo(abi = abi, numberOfCores = cores, currentFrequencies = currentFrequencies, minMaxFrequencies = minMaxFrequencies)
+        return CpuInfo(abi = abi, numberOfCores = cores, currentFrequencies = currentFrequencies, minMaxFrequencies = minMaxFrequencies, cpuTemperature = cpuTemperature)
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
@@ -118,6 +128,7 @@ class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
                 val pair = cpuProvider.getMinMaxFreq(coreNumber)
                 result.success(mapOf(pair))
             }
+            "getCpuTemperature" -> result.success(cpuProvider.getCpuTemperature())
             "getCpuInfo" -> result.success(gson.toJson(getCpuInfo()))
             else -> {
                 result.notImplemented()
