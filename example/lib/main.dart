@@ -41,9 +41,8 @@ class _MyAppState extends State<MyApp> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       StreamBuilder(
-                          stream: CpuReader.cpuStream(5000),
-                          builder:
-                              (context, AsyncSnapshot<Map<int, int>> snapshot) {
+                          stream: CpuReader.cpuStream(500),
+                          builder: (context, AsyncSnapshot<CpuInfo> snapshot) {
                             if (snapshot.connectionState ==
                                     ConnectionState.active &&
                                 snapshot.hasData) {
@@ -52,10 +51,10 @@ class _MyAppState extends State<MyApp> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'CPU core 1 Stream frequency',
+                                    'Temperature',
                                     style: TextStyle(color: Colors.blue),
                                   ),
-                                  Text('${snapshot.data[2]}',
+                                  Text('${snapshot.data.cpuTemperature}',
                                       style: TextStyle(color: Colors.blue)),
                                 ],
                               );
@@ -66,7 +65,7 @@ class _MyAppState extends State<MyApp> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text('Android Binary Interface'),
-                          Text(data.abi)
+                          Text('${data.abi}')
                         ],
                       ),
                       Row(
@@ -76,7 +75,7 @@ class _MyAppState extends State<MyApp> {
                           Text('${data.numberOfCores}')
                         ],
                       ),
-                      ...data.currentFriquencies.entries
+                      ...data.currentFrequencies.entries
                           .map((entry) => Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,

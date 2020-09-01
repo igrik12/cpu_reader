@@ -9,10 +9,11 @@ class CpuReader {
   static const MethodChannel _channel = const MethodChannel('cpu_reader');
   static const EventChannel _stream = EventChannel('cpuReaderStream');
 
-  static Stream<Map<int, int>> cpuStream(int intervalInSeconds) {
-    return _stream
-        .receiveBroadcastStream(intervalInSeconds)
-        .map((event) => Map.from(event));
+  static Stream<CpuInfo> cpuStream(int interval) {
+    var str = _stream
+        .receiveBroadcastStream(interval)
+        .map((event) => CpuInfo.fromJson(jsonDecode(event)));
+    return str;
   }
 
   // Gets the Android Binary Interface of the device

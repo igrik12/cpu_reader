@@ -2,9 +2,7 @@ package com.igrik.cpu_reader
 
 import android.os.Build
 import timber.log.Timber
-import java.io.File
-import java.io.FileFilter
-import java.io.RandomAccessFile
+import java.io.*
 import java.util.regex.Pattern
 
 class CpuDataProvider constructor() {
@@ -81,6 +79,25 @@ class CpuDataProvider constructor() {
             files.size
         } catch (e: Exception) {
             1
+        }
+    }
+
+    fun getCpuTemperature(): Double {
+        try {
+            val process = Runtime.getRuntime().exec("cat sys/class/thermal/thermal_zone0/temp")
+            process.waitFor()
+            val reader =  BufferedReader( InputStreamReader(process.getInputStream()))
+            val line = reader.readLine()
+            return if(line!=null) {
+                val temp = line.toInt()
+                temp / 1000.0;
+            }else{
+                0.0;
+            }
+        }
+        catch(e: Exception) {
+            e.printStackTrace()
+            return 0.0;
         }
     }
 
