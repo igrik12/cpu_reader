@@ -54,3 +54,10 @@
 * Major performance improvements. Removed event channel as data stream, as it was causing higher CPU usage.
 * Updated example
  
+## 2.0.0-dev.2
+* package conflicts fix
+
+## 2.0.0
+* Major performance improvements.  
+* CPU stream generated on the flutter side instead of native.
+* Example updated
