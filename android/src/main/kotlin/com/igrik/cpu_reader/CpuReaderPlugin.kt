@@ -23,11 +23,7 @@ class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
     // / This local reference serves to register the plugin with the Flutter Engine and unregister it
     // / when the Flutter Engine is detached from the Activity
     private lateinit var channel: MethodChannel
-    private lateinit var eventChannel: EventChannel
     private lateinit var cpuProvider: CpuDataProvider
-    private lateinit var gson: Gson
-    private var timerSubscription: Disposable? = null
-    private val TAG: String = "CPU Event Channel"
     private lateinit var cache: HashMap<String, Any>
 
     @Suppress("UNCHECKED_CAST")
@@ -35,46 +31,7 @@ class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
         channel = MethodChannel(flutterPluginBinding.flutterEngine.dartExecutor, "cpu_reader")
         channel.setMethodCallHandler(this)
         cpuProvider = CpuDataProvider()
-        gson = Gson()
         cache = hashMapOf<String, Any>()
-        eventChannel = EventChannel(flutterPluginBinding.flutterEngine.dartExecutor, "cpuReaderStream")
-        eventChannel.setStreamHandler(object : EventChannel.StreamHandler {
-            override fun onListen(args: Any?, events: EventChannel.EventSink) {
-                val interval = args as? Int ?: 1000
-                Log.w(TAG, "added stream listener with interval $interval milliseconds")
-
-                fun handler(timer: Long) {
-                    events.success(getCpuInfo())
-                }
-
-                fun errorHandler(error: Throwable) {
-                    Log.e(TAG, "error in emitting timer", error)
-                    events.error("STREAM", "Error in processing observable", error.message)
-                }
-                timerSubscription = Observable
-                        .interval(0, interval.toLong(), TimeUnit.MILLISECONDS)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(::handler, ::errorHandler)
-            }
-            override fun onCancel(p0: Any?) {
-                Log.w(TAG, "cancelling listener")
-                if (timerSubscription != null) {
-                    timerSubscription!!.dispose()
-                    timerSubscription = null
-                }
-            }
-        })
-    }
-    /**
-     * Retrieves current CPU frequencies for all the cores
-     */
-    private fun getCurrentFrequencies(): MutableMap<Int, Long> {
-        val cores = cpuProvider.getNumberOfCores()
-        val currentFrequencies = mutableMapOf<Int, Long>()
-        for (i in 0 until cores) {
-            currentFrequencies[i] = cpuProvider.getCurrentFreq(i)
-        }
-        return currentFrequencies
     }
 
     // This static function is optional and equivalent to onAttachedToEngine. It supports the old

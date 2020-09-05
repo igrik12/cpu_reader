@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:cpu_reader/cpu_reader.dart';
 import 'package:cpu_reader/cpuinfo.dart';
 import 'package:flutter/material.dart';
@@ -14,17 +12,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  CpuInfo _cpuInfo = CpuInfo()..currentFrequencies = Map();
-  Timer _timer;
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(Duration(milliseconds: 1000), (timer) async {
-      var info = await CpuReader.cpuInfo;
-      setState(() {
-        _cpuInfo = info;
-      });
-    });
   }
 
   @override
@@ -37,33 +27,37 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Center(child: Text("${_cpuInfo?.currentFrequencies[1]}")),
-        ),
-        floatingActionButton: Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
-          child: FloatingActionButton(
-            onPressed: () {
-              setState(() {});
-            },
-            child: Icon(Icons.refresh),
+          child: Column(
+            children: [
+              FutureBuilder<CpuInfo>(
+                  future: CpuReader.cpuInfo,
+                  builder: (context, AsyncSnapshot<CpuInfo> snapshot) =>
+                      snapshot.hasData
+                          ? Text(
+                              'Number of cores: ${snapshot.data.numberOfCores}')
+                          : Text('No data!')),
+              StreamBuilder<CpuInfo>(
+                  stream: CpuReader.cpuStream(1000),
+                  builder: (_, AsyncSnapshot<CpuInfo> snapshot) {
+                    if (snapshot.hasData) {
+                      return Column(
+                        children: buildFreqList(snapshot),
+                      );
+                    }
+                    return Text('No data!');
+                  }),
+            ],
           ),
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
   }
 
-  List<Widget> getFrequencies() {
-    return _cpuInfo != null
-        ? _cpuInfo?.currentFrequencies?.entries
-            ?.map((entry) => Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Core ${entry.key}'),
-                    Text('${entry.value} Mhz')
-                  ],
-                ))
-            ?.toList()
-        : [SizedBox()];
+  List<Row> buildFreqList(AsyncSnapshot<CpuInfo> snapshot) {
+    return snapshot.data.currentFrequencies.entries
+        .map((entry) => Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [Text('CPU ${entry.key} '), Text('${entry.value}')]))
+        .toList();
   }
 }
