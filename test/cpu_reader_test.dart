@@ -47,11 +47,11 @@ void main() {
   });
 
   test('getAbi', () async {
-    expect(await CpuReader.abi, abi);
+    expect(await CpuReader.getAbi, abi);
   });
 
   test('getNumberOfCores', () async {
-    expect(await CpuReader.numberOfCores, numberOfCores);
+    expect(await CpuReader.getNumberOfCores, numberOfCores);
   });
 
   test('getCurrentFrequency', () async {

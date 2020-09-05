@@ -27,83 +27,37 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Center(
-              child: FutureBuilder(
-            future: CpuReader.cpuInfo,
-            builder: (BuildContext context, AsyncSnapshot<CpuInfo> snapshot) {
-              if (snapshot.connectionState == ConnectionState.done &&
-                  snapshot.hasData) {
-                var data = snapshot.data;
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      StreamBuilder(
-                          stream: CpuReader.cpuStream(500),
-                          builder: (context, AsyncSnapshot<CpuInfo> snapshot) {
-                            if (snapshot.connectionState ==
-                                    ConnectionState.active &&
-                                snapshot.hasData) {
-                              return Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Temperature',
-                                    style: TextStyle(color: Colors.blue),
-                                  ),
-                                  Text('${snapshot.data.cpuTemperature}',
-                                      style: TextStyle(color: Colors.blue)),
-                                ],
-                              );
-                            }
-                            return CircularProgressIndicator();
-                          }),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Android Binary Interface'),
-                          Text('${data.abi}')
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Number of Cores'),
-                          Text('${data.numberOfCores}')
-                        ],
-                      ),
-                      ...data.currentFrequencies.entries
-                          .map((entry) => Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Core ${entry.key}'),
-                                  Text('${entry.value} Mhz')
-                                ],
-                              ))
-                          .toList()
-                    ],
-                  ),
-                );
-              }
-              return CircularProgressIndicator();
-            },
-          )),
-        ),
-        floatingActionButton: Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
-          child: FloatingActionButton(
-            onPressed: () {
-              setState(() {});
-            },
-            child: Icon(Icons.refresh),
+          child: Column(
+            children: [
+              FutureBuilder<CpuInfo>(
+                  future: CpuReader.cpuInfo,
+                  builder: (context, AsyncSnapshot<CpuInfo> snapshot) =>
+                      snapshot.hasData
+                          ? Text(
+                              'Number of cores: ${snapshot.data.numberOfCores}')
+                          : Text('No data!')),
+              StreamBuilder<CpuInfo>(
+                  stream: CpuReader.cpuStream(1000),
+                  builder: (_, AsyncSnapshot<CpuInfo> snapshot) {
+                    if (snapshot.hasData) {
+                      return Column(
+                        children: buildFreqList(snapshot),
+                      );
+                    }
+                    return Text('No data!');
+                  }),
+            ],
           ),
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
+  }
+
+  List<Row> buildFreqList(AsyncSnapshot<CpuInfo> snapshot) {
+    return snapshot.data.currentFrequencies.entries
+        .map((entry) => Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [Text('CPU ${entry.key} '), Text('${entry.value}')]))
+        .toList();
   }
 }
