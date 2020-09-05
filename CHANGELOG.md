@@ -49,3 +49,8 @@
 
 ## 1.0.3
 * Updated documentation
+
+## 2.0.0-dev.1
+* Major performance improvements. Removed event channel as data stream, as it was causing higher CPU usage.
+* Updated example
+ 
