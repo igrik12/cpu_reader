@@ -1,7 +1,7 @@
 import 'minMaxFreq.dart';
 
-// This class represents the overall CPU information gathered from the native
-// side.
+/// This class represents the overall CPU information gathered from the native
+/// side.
 class CpuInfo {
   int numberOfCores;
   double cpuTemperature;
@@ -16,31 +16,32 @@ class CpuInfo {
       this.currentFrequencies,
       this.cpuTemperature});
 
-  // Deserialize the data retrieved from the device through platform specific code
+  /// Deserialize the data [json] retrieved from the device through platform specific code
   CpuInfo.fromJson(Map<dynamic, dynamic> json) {
     this.numberOfCores = json['numberOfCores'];
     this.abi = json['abi'];
     this.cpuTemperature = json['cpuTemperature'];
     Map.from(json['currentFrequencies']).forEach((key, value) {
-      this.currentFrequencies[int.parse(key)] = value;
+      this.currentFrequencies[key] = value;
     });
 
     Map.from(json['minMaxFrequencies']).forEach((key, value) {
       var map = Map.from(value);
-      this.minMaxFrequencies[int.parse(key)] =
-          MinMaxFrequency(map['first'], map['second']);
+      this.minMaxFrequencies[key] = MinMaxFrequency(map['min'], map['max']);
     });
   }
 
+  /// Converts instance to Json format
   Map<String, dynamic> toJson() => {
         "abi": abi,
         "numberOfCores": numberOfCores,
         "cpuTemprature": cpuTemperature,
-        "currentFrequencies": currentFrequencies.map(convert),
-        "minMaxFrequencies": minMaxFrequencies.map(convert)
+        "currentFrequencies": currentFrequencies.map(_convert),
+        "minMaxFrequencies": minMaxFrequencies.map(_convert)
       };
 
-  MapEntry convert<T>(int key, T value) {
+  /// Helper function to convert Map<Y, T> => Map<String, T>
+  MapEntry _convert<T>(int key, T value) {
     return MapEntry(key.toString(), value);
   }
 }

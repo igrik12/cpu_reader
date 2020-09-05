@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cpu_reader/cpu_reader.dart';
 import 'package:cpu_reader/cpuinfo.dart';
 import 'package:flutter/material.dart';
@@ -12,9 +14,17 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  CpuInfo _cpuInfo = CpuInfo()..currentFrequencies = Map();
+  Timer _timer;
   @override
   void initState() {
     super.initState();
+    _timer = Timer.periodic(Duration(milliseconds: 1000), (timer) async {
+      var info = await CpuReader.cpuInfo;
+      setState(() {
+        _cpuInfo = info;
+      });
+    });
   }
 
   @override
@@ -27,71 +37,7 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Center(
-              child: FutureBuilder(
-            future: CpuReader.cpuInfo,
-            builder: (BuildContext context, AsyncSnapshot<CpuInfo> snapshot) {
-              if (snapshot.connectionState == ConnectionState.done &&
-                  snapshot.hasData) {
-                var data = snapshot.data;
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      StreamBuilder(
-                          stream: CpuReader.cpuStream(500),
-                          builder: (context, AsyncSnapshot<CpuInfo> snapshot) {
-                            if (snapshot.connectionState ==
-                                    ConnectionState.active &&
-                                snapshot.hasData) {
-                              return Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Temperature',
-                                    style: TextStyle(color: Colors.blue),
-                                  ),
-                                  Text('${snapshot.data.cpuTemperature}',
-                                      style: TextStyle(color: Colors.blue)),
-                                ],
-                              );
-                            }
-                            return CircularProgressIndicator();
-                          }),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Android Binary Interface'),
-                          Text('${data.abi}')
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Number of Cores'),
-                          Text('${data.numberOfCores}')
-                        ],
-                      ),
-                      ...data.currentFrequencies.entries
-                          .map((entry) => Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Core ${entry.key}'),
-                                  Text('${entry.value} Mhz')
-                                ],
-                              ))
-                          .toList()
-                    ],
-                  ),
-                );
-              }
-              return CircularProgressIndicator();
-            },
-          )),
+          child: Center(child: Text("${_cpuInfo?.currentFrequencies[1]}")),
         ),
         floatingActionButton: Padding(
           padding: const EdgeInsets.only(bottom: 16.0),
@@ -105,5 +51,19 @@ class _MyAppState extends State<MyApp> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
+  }
+
+  List<Widget> getFrequencies() {
+    return _cpuInfo != null
+        ? _cpuInfo?.currentFrequencies?.entries
+            ?.map((entry) => Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Core ${entry.key}'),
+                    Text('${entry.value} Mhz')
+                  ],
+                ))
+            ?.toList()
+        : [SizedBox()];
   }
 }

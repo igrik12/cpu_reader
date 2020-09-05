@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 
 /** CpuReaderPlugin */
 class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
-    // / The MethodChannel that will the communication between Flutter and native Android
+    // / The MethodChannel that will act as the communication between Flutter and native Android
     // /
     // / This local reference serves to register the plugin with the Flutter Engine and unregister it
     // / when the Flutter Engine is detached from the Activity
@@ -44,7 +44,7 @@ class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
                 Log.w(TAG, "added stream listener with interval $interval milliseconds")
 
                 fun handler(timer: Long) {
-                    events.success(gson.toJson(getCpuInfo()))
+                    events.success(getCpuInfo())
                 }
 
                 fun errorHandler(error: Throwable) {
@@ -65,7 +65,9 @@ class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
             }
         })
     }
-    
+    /**
+     * Retrieves current CPU frequencies for all the cores
+     */
     private fun getCurrentFrequencies(): MutableMap<Int, Long> {
         val cores = cpuProvider.getNumberOfCores()
         val currentFrequencies = mutableMapOf<Int, Long>()
@@ -95,16 +97,19 @@ class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
     // This function retrieves all of the CPU information for all the cores
     // as CpuInfo object
     @Suppress("UNCHECKED_CAST")
-    private fun getCpuInfo(): CpuInfo {
+    private fun getCpuInfo(): Map<String, Any> {
+        val map = mutableMapOf<String,Any>()
         val abi = cache.getOrPut("abi") { cpuProvider.getAbi() } as String
         val cores = cache.getOrPut("cores") { cpuProvider.getNumberOfCores() }
         val minMaxFrequencies = cache.getOrPut("minMaxFrequencies") {
-            var minMax = mutableMapOf<Int, Pair<Long, Long>>()
+            val minMax = mutableMapOf<Int, Map<String, Long>>()
             for (i in 0 until cores as Int) {
-                minMax[i] = cpuProvider.getMinMaxFreq(i)
+                val values = cpuProvider.getMinMaxFreq(i);
+                val mapOfMinMax = mapOf("min" to values.first, "max" to values.second)
+                minMax[i] = mapOfMinMax
             }
             minMax
-        } as MutableMap<Int, Pair<Long, Long>>
+        } as MutableMap<Int, Map<String, Long>>
 
         val cpuTemperature = cpuProvider.getCpuTemperature()
         val currentFrequencies = mutableMapOf<Int, Long>()
@@ -112,7 +117,13 @@ class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
             currentFrequencies[i] = cpuProvider.getCurrentFreq(i)
         }
 
-        return CpuInfo(abi = abi, numberOfCores = cores, currentFrequencies = currentFrequencies, minMaxFrequencies = minMaxFrequencies, cpuTemperature = cpuTemperature)
+        map["abi"] = abi
+        map["numberOfCores"] = cores
+        map["minMaxFrequencies"] = minMaxFrequencies
+        map["currentFrequencies"] = currentFrequencies
+        map["cpuTemperature"] = cpuTemperature
+
+        return map
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
@@ -129,7 +140,7 @@ class CpuReaderPlugin : FlutterPlugin, MethodCallHandler {
                 result.success(mapOf(pair))
             }
             "getCpuTemperature" -> result.success(cpuProvider.getCpuTemperature())
-            "getCpuInfo" -> result.success(gson.toJson(getCpuInfo()))
+            "getCpuInfo" -> result.success(getCpuInfo())
             else -> {
                 result.notImplemented()
             }

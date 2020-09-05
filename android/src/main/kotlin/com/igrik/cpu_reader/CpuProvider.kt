@@ -5,6 +5,10 @@ import timber.log.Timber
 import java.io.*
 import java.util.regex.Pattern
 
+/**
+ * This class is responsible for providing CPU specific information
+ * such as ABI, number of cores, temperature and frequencies
+ */
 class CpuDataProvider constructor() {
     /**
     Read Android Binary Interface information from the device
@@ -81,7 +85,9 @@ class CpuDataProvider constructor() {
             1
         }
     }
-
+    /**
+     * Retrieves current thermal overall temperature for all the CPUs
+     */
     fun getCpuTemperature(): Double {
         try {
             val process = Runtime.getRuntime().exec("cat sys/class/thermal/thermal_zone0/temp")
