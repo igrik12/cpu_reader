@@ -42,3 +42,22 @@
 
 ## 1.0.1
 * Minor bug fixes
+
+## 1.0.2
+* Added temperature value retrieval
+* Now also allows to stream all of the CPU info (static data, such as min/max frequencies is cached, and therefore avoids any unnecessary I/O operations)
+
+## 1.0.3
+* Updated documentation
+
+## 2.0.0-dev.1
+* Major performance improvements. Removed event channel as data stream, as it was causing higher CPU usage.
+* Updated example
+ 
+## 2.0.0-dev.2
+* package conflicts fix
+
+## 2.0.0
+* Major performance improvements.  
+* CPU stream generated on the flutter side instead of native.
+* Example updated

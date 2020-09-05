@@ -15,7 +15,7 @@ void main() {
   final CpuInfo cpuInfo = CpuInfo()
     ..abi = abi
     ..numberOfCores = numberOfCores
-    ..currentFriquencies = {0: 1000, 1: 1000, 2: 3000}
+    ..currentFrequencies = {0: 1000, 1: 1000, 2: 3000}
     ..minMaxFrequencies = {
       0: MinMaxFrequency(300, 1000),
       1: MinMaxFrequency(600, 2700)
@@ -47,11 +47,11 @@ void main() {
   });
 
   test('getAbi', () async {
-    expect(await CpuReader.abi, abi);
+    expect(await CpuReader.getAbi, abi);
   });
 
   test('getNumberOfCores', () async {
-    expect(await CpuReader.numberOfCores, numberOfCores);
+    expect(await CpuReader.getNumberOfCores, numberOfCores);
   });
 
   test('getCurrentFrequency', () async {
@@ -60,8 +60,8 @@ void main() {
 
   test('getCpuInfo', () async {
     expect((await CpuReader.cpuInfo).abi, cpuInfo.abi);
-    expect((await CpuReader.cpuInfo).currentFriquencies,
-        cpuInfo.currentFriquencies);
+    expect((await CpuReader.cpuInfo).currentFrequencies,
+        cpuInfo.currentFrequencies);
     expect((await CpuReader.cpuInfo).numberOfCores, cpuInfo.numberOfCores);
     expect((await CpuReader.cpuInfo).minMaxFrequencies.length,
         cpuInfo.minMaxFrequencies.length);
