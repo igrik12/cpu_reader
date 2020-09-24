@@ -2,11 +2,13 @@ package com.igrik.cpu_reader
 
 import android.os.Build
 import timber.log.Timber
-import java.io.File
-import java.io.FileFilter
-import java.io.RandomAccessFile
+import java.io.*
 import java.util.regex.Pattern
 
+/**
+ * This class is responsible for providing CPU specific information
+ * such as ABI, number of cores, temperature and frequencies
+ */
 class CpuDataProvider constructor() {
     /**
     Read Android Binary Interface information from the device
@@ -81,6 +83,19 @@ class CpuDataProvider constructor() {
             files.size
         } catch (e: Exception) {
             1
+        }
+    }
+
+    /**
+     * Retrieves the current overall thermal temperature for all the CPUs
+     */
+    fun getCpuTemperature(): Double{
+        val tempPath = "sys/class/thermal/thermal_zone0/temp"
+        return try {
+            RandomAccessFile(tempPath, "r").use { it.readLine().toDouble() / 1000 }
+        } catch (e: Exception) {
+            Timber.e(e)
+            -1.0
         }
     }
 
