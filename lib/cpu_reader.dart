@@ -14,10 +14,19 @@ class CpuReader {
   static HashMap<int, MinMaxFrequency<int>> _minMaxFrequencies =
       HashMap<int, MinMaxFrequency<int>>();
 
-  /// [CpuInfo] stream with set [interval] value as [Duration]
+  /// [CpuInfo] stream with set [interval] in milliseconds
   static Stream<CpuInfo> cpuStream(int interval) async* {
     while (true) {
       await Future.delayed(Duration(milliseconds: interval));
+      CpuInfo info = await CpuReader.cpuInfo;
+      yield info;
+    }
+  }
+
+  ///  [CpuInfo] stream with set [interval] duration
+  static Stream<CpuInfo> cpuStream(Duration interval) async* {
+    while(true) {
+      await Future.delayed(interval);
       CpuInfo info = await CpuReader.cpuInfo;
       yield info;
     }
